@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <istream>
-#include <stdexcept>
 
 class Parser {
 public:

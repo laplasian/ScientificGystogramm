@@ -4,6 +4,21 @@
 #include <stdexcept>
 #include <map>
 
+#include "Parser.h"
+
+// TEST Parser
+
+TEST(Parser, Valid) {
+    std::istringstream input("1 2 3 4 5 6 7 8 9 ");
+    std::vector<double> expected = {1,2,3,4,5,6,7,8,9};
+    EXPECT_EQ(Parser::get_data(input), expected);
+}
+
+TEST(Parser, EmptyInput) {
+    std::istringstream input("");
+    EXPECT_THROW(Parser::get_data(input), std::runtime_error);
+}
+
 TEST(GystogrammTest, BasicBins) {
     std::vector<double> data = {1, 2, 3};
     Gystogramm g(data, 1.0, 4.0, 3);
@@ -53,6 +68,18 @@ TEST(GystogrammOperators, NegativeCountThrows) {
     Gystogramm g1({1}, 1.0, 4.0, 3);
     Gystogramm g2({1,1}, 1.0, 4.0, 3);
     EXPECT_THROW(g1 - g2, std::runtime_error);
+}
+
+TEST(GystogrammOperators, Comparings) {
+    Gystogramm g1({1,2}, 1.0, 4.0, 3);
+    Gystogramm g2({1,2}, 1.0, 4.0, 3);
+    Gystogramm g3({3,4}, 0.0, 4.0, 3);
+    Gystogramm g4({5,5}, 1.0, 4.0, 3);
+
+    EXPECT_TRUE(g1 == g2);
+    EXPECT_THROW(g1 == g3, std::runtime_error);
+    EXPECT_TRUE(g1 != g4);
+    EXPECT_THROW(g1 != g3, std::runtime_error);
 }
 
 int main(int argc, char **argv) {

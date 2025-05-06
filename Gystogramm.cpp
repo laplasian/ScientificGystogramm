@@ -8,7 +8,7 @@ Gystogramm::Gystogramm(double min, double max, size_t bin_count) : min_(min), ma
     if (bin_count_ == 0 || max_ <= min_) {
         throw runtime_error("ERROR! wrong histogram parameters");
     }
-    bin_size_ = (max_ - min_) / bin_count_;
+    bin_size_ = (max_ - min_) / static_cast<int>(bin_count_);
     init_bins();
 }
 
@@ -40,8 +40,8 @@ Gystogramm& Gystogramm::operator+=(const Gystogramm& other) {
     if (min_ != other.min_ || max_ != other.max_ || bin_count_ != other.bin_count_) {
         throw runtime_error("ERROR! different parameters");
     }
-    for (auto& kv : bins_) {
-        kv.second += other.bins_.at(kv.first);
+    for (auto& v : bins_) {
+        v.second += other.bins_.at(v.first);
     }
     return *this;
 }
