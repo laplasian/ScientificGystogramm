@@ -1,11 +1,13 @@
 #include "Parser.h"
-#include "Gystogramm.h"
+#include "Histogram.h"
 #include <iostream>
 #include <fstream>
+#include <string>
 
-void print_hist(const Gystogramm& hist) {
+void print_hist(Histogram& hist) {
+    std::cout << "histogram: " << std::endl;
     for (auto it = hist.begin(); it != hist.end(); ++it) {
-        std::cout << it->first << " " << it->second << std::endl;
+        std::cout << hist.id(it) << " - " << hist.at(it) << std::endl;
     }
 }
 
@@ -21,9 +23,12 @@ int main(int argc, char *argv[]) {
 
     try {
         std::ifstream in(input_fn);
-        auto data = Parser::get_data(in);
+        Histogram hist(min, max, bins);
+        while (Parser::finish != true) {
+            auto data = Parser::get_data(in);
+            hist.add(data);
+        }
         in.close();
-        Gystogramm hist(data, min, max, bins);
         print_hist(hist);
     } catch (std::exception &e) {
         std::cout << e.what() << std::endl;

@@ -18,16 +18,16 @@ enable_testing()
 add_executable(ScientificGystogramm main.cpp
         Parser.cpp
         Parser.h
-        Gystogramm.cpp
-        Gystogramm.h
+        Histogram.cpp
+        Histogram.h
 )
 
 add_executable(ScientificGystogramm_test
         gtest.cpp
         Parser.cpp
         Parser.h
-        Gystogramm.cpp
-        Gystogramm.h
+        Histogram.cpp
+        Histogram.h
 )
 
 target_link_libraries(ScientificGystogramm_test GTest::gtest_main)
