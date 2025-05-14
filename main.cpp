@@ -13,7 +13,7 @@ void print_hist(Histogram& hist) {
 
 int main(int argc, char *argv[]) {
     if (argc != 5) {
-        std::cout << "args error" << std::endl;
+        std::cout << "Error! Please input parameters in correct order: input_filename, min, max, bins_count" << std::endl;
         return -1;
     }
     const char* input_fn = argv[1];
