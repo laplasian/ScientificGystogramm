@@ -83,7 +83,7 @@ TEST(GystogrammOperators, Comparings) {
     EXPECT_TRUE(g1 == g2);
     EXPECT_FALSE(g1 == g3);
     EXPECT_TRUE(g1 != g4);
-    EXPECT_FALSE(g1 != g3);
+    EXPECT_TRUE(g1 != g3);
 }
 
 int main(int argc, char **argv) {

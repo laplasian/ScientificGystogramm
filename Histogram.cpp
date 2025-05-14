@@ -20,7 +20,7 @@ Histogram::Histogram(const vector<double>& data, double min, double max, size_t 
 }
 
 void Histogram::add(double value) {
-    if (!isnormal(value)) {
+    if (!isnormal(value) && value != 0) {
         throw runtime_error("ERROR! trying add bad value to histogram");
     }
     int idx = static_cast<int>(floor((value - min_) / bin_size_));
@@ -68,9 +68,7 @@ Histogram Histogram::operator-(const Histogram& other) const {
 }
 
 bool Histogram::operator==(const Histogram& other) const {
-    if (min_ == other.min_ && max_ == other.max_ && bins_.size() == other.bins_.size()) {
-        return bins_ == other.bins_;
-    } else return false;
+    return min_ == other.min_ && max_ == other.max_ && bins_.size() == other.bins_.size() && bins_ == other.bins_;
 }
 
 bool Histogram::operator!=(const Histogram& other) const {
