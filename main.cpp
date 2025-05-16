@@ -6,8 +6,8 @@
 
 void print_hist(Histogram& hist) {
     std::cout << "histogram: " << std::endl;
-    for (auto it = hist.begin(); it != hist.end(); ++it) {
-        std::cout << hist.id(it) << " - " << hist.at(it) << std::endl;
+    for (int i = 0; i < hist.size(); i++) {
+        std::cout << i << " - " << hist[i] << std::endl;
     }
 }
 
@@ -24,10 +24,8 @@ int main(int argc, char *argv[]) {
     try {
         std::ifstream in(input_fn);
         Histogram hist(min, max, bins);
-        while (Parser::finish != true) {
-            auto data = Parser::get_data(in);
-            hist.add(data);
-        }
+        auto p = Parser((Adder&)hist);
+        p.get_data(in);
         in.close();
         print_hist(hist);
     } catch (std::exception &e) {

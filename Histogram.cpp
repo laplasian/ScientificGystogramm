@@ -16,11 +16,13 @@ Histogram::Histogram(double min, double max, size_t bin_count) : min_(min), max_
 }
 
 Histogram::Histogram(const vector<double>& data, double min, double max, size_t bin_count) : Histogram(min, max, bin_count) {
-    add(data);
+    for (auto d: data) {
+        Histogram::add(d);
+    }
 }
 
 void Histogram::add(double value) {
-    if (!isnormal(value) && value != 0) {
+    if (!isnormal(value) && value != 0.0 && value != -0.0) {
         throw runtime_error("ERROR! trying add bad value to histogram");
     }
     int idx = static_cast<int>(floor((value - min_) / bin_size_));
@@ -29,16 +31,8 @@ void Histogram::add(double value) {
     bins_[static_cast<size_t>(idx)]++;
 }
 
-void Histogram::add(const vector<double>& data) {
-    for (double v : data) {
-        add(v);
-    }
-}
-
 Histogram& Histogram::operator+=(const Histogram& other) {
-    if (min_ != other.min_ || max_ != other.max_ || bins_.size() != other.bins_.size()) {
-        throw runtime_error("addition logic error");
-    }
+    addable(other);
     for (size_t i = 0; i < bins_.size(); i++) {
         bins_[i] += other.bins_[i];
     }
@@ -46,9 +40,7 @@ Histogram& Histogram::operator+=(const Histogram& other) {
 }
 
 Histogram& Histogram::operator-=(const Histogram& other) {
-    if (min_ != other.min_ || max_ != other.max_ || bins_.size() != other.bins_.size()) {
-        throw runtime_error("subtraction logic error");
-    }
+    addable(other);
     for (size_t i = 0; i < bins_.size(); i++) {
         bins_[i] = bins_[i] > other.bins_[i] ? bins_[i] - other.bins_[i] : 0;
     }
@@ -68,7 +60,7 @@ Histogram Histogram::operator-(const Histogram& other) const {
 }
 
 bool Histogram::operator==(const Histogram& other) const {
-    return min_ == other.min_ && max_ == other.max_ && bins_.size() == other.bins_.size() && bins_ == other.bins_;
+    return eqwl(min_, other.min_) && eqwl(max_, other.max_) && bins_ == other.bins_;
 }
 
 bool Histogram::operator!=(const Histogram& other) const {
