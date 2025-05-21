@@ -5,11 +5,12 @@
 using namespace std;
 
 Histogram::Histogram(double min, double max, size_t bin_count) : min_(min), max_(max) {
-    if (isnormal(min) && isnormal(max) == false) {
-        throw runtime_error("ERROR! wrong histogram parameters");
+    auto a = (isnormal(min) || min == 0.0 || min == -0.0);
+    if (((isnormal(min) || min == 0.0 || min == -0.0) && (isnormal(max) || max == 0.0 || max == -0.0)) == false) {
+        throw invalid_argument("ERROR! wrong histogram parameters");
     }
     if (bin_count == 0 || max_ <= min_) {
-        throw runtime_error("ERROR! wrong histogram parameters");
+        throw invalid_argument("ERROR! wrong histogram parameters");
     }
     bin_size_ = (max_ - min_) / static_cast<int>(bin_count);
     bins_.resize(bin_count,0);
@@ -23,7 +24,7 @@ Histogram::Histogram(const vector<double>& data, double min, double max, size_t 
 
 void Histogram::add(double value) {
     if (!isnormal(value) && value != 0.0 && value != -0.0) {
-        throw runtime_error("ERROR! trying add bad value to histogram");
+        throw invalid_argument("ERROR! trying add bad value to histogram");
     }
     int idx = static_cast<int>(floor((value - min_) / bin_size_));
     if (idx < 0) idx = 0;

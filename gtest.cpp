@@ -1,3 +1,4 @@
+#include <cmath>
 #include <gtest/gtest.h>
 #include "Histogram.h"
 #include <vector>
@@ -7,7 +8,7 @@
 
 // TEST Parser
 
-class Vector_mock: virtual Adder {
+class Vector_mock: public Adder {
 public:
     Vector_mock() = default;
     void add(double value) override {data.push_back(value);};
@@ -53,7 +54,7 @@ TEST(Parser, Valid) {
         expected.push_back(i);
     }
     Vector_mock vector;
-    Parser p{(Adder&)vector};
+    Parser p(vector);
     p.get_data(input);
     EXPECT_EQ(vector.data, expected);
 }
@@ -62,10 +63,29 @@ TEST(Parser, EmptyInput) {
     std::istringstream input("");
     std::vector<double> expected = {};
     Vector_mock vector;
-    Parser p{(Adder&)vector};
+    Parser p(vector);
     p.get_data(input);
     EXPECT_EQ(vector.data, expected);
 }
+
+TEST(Parser, InvalidTokenInput) {
+    std::istringstream input("1.0 2.5 r 3.5 4.0");
+    Vector_mock vector;
+    Parser p(vector);
+    EXPECT_NO_THROW(p.get_data(input));
+    std::vector<double> expected = {1.0, 2.5};
+    EXPECT_EQ(vector.data, expected);
+}
+
+TEST(Parser, BadStreamThrows) {
+    std::ifstream in("noexist.txt");
+    ASSERT_FALSE(in.good());
+    Vector_mock vector;
+    Parser p(vector);
+    EXPECT_THROW(p.get_data(in), std::runtime_error);
+}
+
+
 // TEST HISTOGRAM
 
 TEST(GystogrammTest, BasicBins) {
@@ -112,7 +132,7 @@ TEST(GystogrammTest, BigData) {
                           "954 955 956 957 958 959 960 961 962 963 964 965 966 967 968 969 970 971 972 973 974 975 976 977 978 979 980 981 982 983 "
                           "984 985 986 987 988 989 990 991 992 993 994 995 996 997 998 999 1000");
     Histogram g1(1, 1000, 1000);
-    Parser p{(Adder&)g1};
+    Parser p(g1);
     p.get_data(in);
     std::vector<size_t> expected = {};
     expected.resize(1000000,1);
@@ -201,6 +221,52 @@ TEST(GystogrammOperators, Comparings) {
     EXPECT_FALSE(g1 == g3);
     EXPECT_TRUE(g1 != g4);
     EXPECT_TRUE(g1 != g3);
+}
+
+
+TEST(HistogramConstructor, ZeroBinCountThrows) {
+    EXPECT_THROW(Histogram(0.0, 1.0, 0), std::invalid_argument);
+}
+
+// max <= min.
+TEST(HistogramConstructor, MaxLessEqualMinThrows) {
+    EXPECT_THROW(Histogram(1.0, 1.0, 3), std::invalid_argument);
+    EXPECT_THROW(Histogram(2.0, 1.0, 3), std::invalid_argument);
+}
+
+// NaN и 0.0 в параметрах.
+TEST(HistogramConstructor, InvalidNumericParametersThrows) {
+    Histogram(0.0, 1, 3);
+    Histogram(-1, 0.0, 3);
+    Histogram(-0.0, 1, 3);
+    Histogram(-1, -0.0, 3);
+    EXPECT_THROW(Histogram(1, NAN, 3), std::invalid_argument);
+    EXPECT_THROW(Histogram(NAN, 1, 3), std::invalid_argument);
+}
+
+// Диапазон в отрицательных значениях.
+TEST(Histogram, NegativeRange) {
+    std::vector<double> data = {-5.0, -4.0, -3.0, -2.0, -1.0};
+    Histogram g(data, -5.0, -1.0, 4);
+
+    std::vector<size_t> expected = {1,1,1,2};
+    ASSERT_EQ(g.size(), expected.size());
+    for (size_t i = 0; i < g.size(); ++i) {
+        EXPECT_EQ(g[i], expected[i]);
+    }
+}
+
+
+TEST(Histogram, BeginEndSize) {
+    Histogram g({1.0, 2.0}, 1.0, 3.0, 2);
+
+    EXPECT_EQ(g.size(), static_cast<size_t>(2));
+    EXPECT_EQ(std::distance(g.begin(), g.end()), static_cast<ptrdiff_t>(g.size()));
+
+    size_t idx = 0;
+    for (auto count : g) {
+        EXPECT_EQ(count, g[idx++]);
+    }
 }
 
 int main(int argc, char **argv) {

@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
     try {
         std::ifstream in(input_fn);
         Histogram hist(min, max, bins);
-        auto p = Parser((Adder&)hist);
+        auto p = Parser(hist);
         p.get_data(in);
         in.close();
         print_hist(hist);

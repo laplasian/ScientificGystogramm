@@ -14,7 +14,7 @@ public:
     virtual void add(double value) = 0;
 };
 
-class Histogram final : virtual Adder{
+class Histogram final : public Adder{
 public:
     Histogram() = default;
     Histogram(const Histogram&)=default;
